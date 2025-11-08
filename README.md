@@ -6,7 +6,9 @@ The 12th player's kit.
 - NPM: 2406397706
 - Class: PBP C
 
----
+### Archive
+<details>
+<summary>Tugas Individu 7</summary>
 
 ## Tugas Individu 7 - PBP Ganjil 2025/2026
 
@@ -33,3 +35,24 @@ BuildContext adalah objek yang menunjukkan posisi suatu widget di dalam widget t
 ### Jelaskan konsep "hot reload" di Flutter dan bagaimana bedanya dengan "hot restart".
 
 Hot reload memperbarui UI aplikasi tanpa mengulang ulang semua state, sehingga perubahan kode langsung terlihat dan nilai-nilai seperti input, counter, atau halaman yang sedang dibuka tetap dipertahankan. Sementara itu, hot restart menjalankan ulang aplikasi dari awal, me-reset seluruh state dan memulai kembali dari main(). Hot reload cepat untuk menguji perubahan UI, sedangkan hot restart digunakan jika perubahan kode memengaruhi struktur aplikasi atau state tidak boleh dipertahankan.
+</details>
+
+---
+
+## Tugas Individu 8 - PBP Ganjil 2025/2026
+
+### Jelaskan perbedaan antara **`Navigator.push()`** dan **`Navigator.pushReplacement()`** pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
+
+Navigator.push() menambahkan halaman baru di atas stack sehingga pengguna masih bisa kembali ke halaman sebelumnya, sedangkan Navigator.pushReplacement() menggantikan halaman saat ini sehingga halaman lama tidak bisa dikembalikan. Pada aplikasi The 12th Kit, push() cocok digunakan untuk navigasi yang membutuhkan kemampuan kembali, seperti membuka form produk dari halaman utama, sementara pushReplacement() lebih tepat untuk navigasi dari drawer seperti menuju Home atau Create Product, karena pengguna tidak perlu kembali ke halaman lama setelah memilih menu utama.
+
+### Bagaimana kamu memanfaatkan **hierarchy widget** seperti `Scaffold`, `AppBar`, dan `Drawer` untuk membangun struktur halaman yang konsisten di seluruh aplikasi?
+
+Saya membangun struktur halaman yang konsisten dengan menempatkan Scaffold sebagai kerangka utama di setiap screen (menyediakan slot standar: appBar, drawer, body, floatingActionButton), lalu mengisi AppBar di atas untuk judul/aksi global yang konsisten (warna dan gaya mengikuti ThemeData.colorScheme), serta menyematkan Drawer yang sama (mis. LeftDrawer) agar navigasi utama seragam di seluruh halaman. Dengan pola ini, hanya bagian body yang berubah sesuai konten (home, daftar produk, form tambah produk), sementara header dan navigasi samping tetap identik, sehingga pengalaman pengguna konsisten, mudah dipelihara, dan tema warna otomatis mengalir ke semua komponen.
+
+### Dalam konteks desain antarmuka, apa kelebihan menggunakan **layout widget** seperti `Padding`, `SingleChildScrollView`, dan `ListView` saat menampilkan elemen-elemen form? Berikan contoh penggunaannya dari aplikasi kamu.
+
+Menggunakan Padding, SingleChildScrollView, dan ListView memberikan tampilan form yang lebih rapi, nyaman, dan tetap bisa di-scroll di berbagai ukuran layar. Padding membantu memberi jarak antar-elemen agar form tidak terlihat penuh dan lebih mudah dibaca, seperti pada setiap TextFormField di halaman tambah produk. SingleChildScrollView memastikan seluruh form tetap dapat diakses saat kontennya panjang atau ketika keyboard muncul, sehingga pengguna tidak perlu khawatir bagian bawah form tertutup yang saya gunakan saat membungkus seluruh Column di halaman form produk agar bisa digulir. Sementara itu, ListView (seperti dalam Drawer) secara otomatis memberikan kemampuan scroll dan mengatur daftar menu agar responsif tanpa harus mengatur tinggi elemen secara manual. Dengan memanfaatkan ketiga widget ini, UI form di aplikasi menjadi bersih, responsif, dan tidak menimbulkan overflow.
+
+### Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
+
+Saya menyesuaikan warna tema dengan memanfaatkan ThemeData dan ColorScheme sehingga seluruh komponen UI otomatis mengikuti identitas visual brand. Pada aplikasi The 12th Kit, saya menentukan palet utama seperti primary untuk warna navbar (#081A33), secondary untuk aksen neon green (#00FF88), serta warna surface dan background untuk tampilan kartu dan halaman. Dengan menggunakan ThemeData(colorScheme: ...), warna-warna ini mengalir ke AppBar, Drawer, ikon, tombol, teks, dan card secara konsisten tanpa harus memberi warna satu per satu. Selain itu, komponen seperti Drawer, ItemCard, dan AppBar semua mengambil warna dari Theme.of(context).colorScheme, sehingga seluruh halaman terasa satu identitas visual yang senada dengan brand The 12th Kit.
