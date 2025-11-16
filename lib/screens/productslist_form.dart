@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:the_12th_kit/widgets/left_drawer.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:the_12th_kit/screens/menu.dart';
 
 class ProductsFormPage extends StatefulWidget {
   const ProductsFormPage({super.key});
@@ -79,25 +83,9 @@ class _ProductsFormPageState extends State<ProductsFormPage> {
     return null;
   }
 
-  void _resetForm() {
-    setState(() {
-      _name = "";
-      _price = 0;
-      _description = "";
-      _thumbnail = "";
-      _category = "club_home";
-      _isFeatured = false;
-      _stock = 0;
-      _brand = "";
-      _league = "";
-      _team = "";
-      _season = "";
-    });
-    _formKey.currentState?.reset();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Form Tambah Produk')),
@@ -301,43 +289,46 @@ class _ProductsFormPageState extends State<ProductsFormPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Produk berhasil disimpan!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Name: $_name'),
-                                    Text('Price: $_price'),
-                                    Text('Description: $_description'),
-                                    Text('Thumbnail: ${_thumbnail.isEmpty ? "-" : _thumbnail}'),
-                                    Text('Category: ${_categories[_category]}'),
-                                    Text('Featured: ${_isFeatured ? "Ya" : "Tidak"}'),
-                                    Text('Stock: $_stock'),
-                                    Text('Brand: ${_brand.isEmpty ? "-" : _brand}'),
-                                    Text('League: ${_league.isEmpty ? "-" : _league}'),
-                                    Text('Team: ${_team.isEmpty ? "-" : _team}'),
-                                    Text('Season: ${_season.isEmpty ? "-" : _season}'),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _resetForm();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                        final response = await request.postJson(
+                          "https://ahmad-faiq41-the12thkit.pbp.cs.ui.ac.id/create-flutter/",
+                          jsonEncode({
+                            "name": _name,
+                            "price": _price,
+                            "description": _description,
+                            "thumbnail": _thumbnail,
+                            "category": _category,
+                            "is_featured": _isFeatured,
+                            "stock": _stock,
+                            "brand": _brand,
+                            "league": _league,
+                            "team": _team,
+                            "season": _season,
+                          }),
                         );
+
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Product successfully saved!"),
+                              ),
+                            );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MyHomePage(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Something went wrong, please try again."),
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                     child: const Text("Save"),

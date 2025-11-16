@@ -37,7 +37,8 @@ BuildContext adalah objek yang menunjukkan posisi suatu widget di dalam widget t
 Hot reload memperbarui UI aplikasi tanpa mengulang ulang semua state, sehingga perubahan kode langsung terlihat dan nilai-nilai seperti input, counter, atau halaman yang sedang dibuka tetap dipertahankan. Sementara itu, hot restart menjalankan ulang aplikasi dari awal, me-reset seluruh state dan memulai kembali dari main(). Hot reload cepat untuk menguji perubahan UI, sedangkan hot restart digunakan jika perubahan kode memengaruhi struktur aplikasi atau state tidak boleh dipertahankan.
 </details>
 
----
+<details>
+<summary>Tugas Individu 8</summary>
 
 ## Tugas Individu 8 - PBP Ganjil 2025/2026
 
@@ -56,3 +57,87 @@ Menggunakan Padding, SingleChildScrollView, dan ListView memberikan tampilan for
 ### Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
 
 Saya menyesuaikan warna tema dengan memanfaatkan ThemeData dan ColorScheme sehingga seluruh komponen UI otomatis mengikuti identitas visual brand. Pada aplikasi The 12th Kit, saya menentukan palet utama seperti primary untuk warna navbar (#081A33), secondary untuk aksen neon green (#00FF88), serta warna surface dan background untuk tampilan kartu dan halaman. Dengan menggunakan ThemeData(colorScheme: ...), warna-warna ini mengalir ke AppBar, Drawer, ikon, tombol, teks, dan card secara konsisten tanpa harus memberi warna satu per satu. Selain itu, komponen seperti Drawer, ItemCard, dan AppBar semua mengambil warna dari Theme.of(context).colorScheme, sehingga seluruh halaman terasa satu identitas visual yang senada dengan brand The 12th Kit.
+</details>
+
+---
+
+## Tugas Individu 9 - PBP Ganjil 2025/26
+
+### Jelaskan mengapa kita perlu membuat model Dart saat mengambil/mengirim data JSON? Apa konsekuensinya jika langsung memetakan `Map<String, dynamic>` tanpa model (terkait validasi tipe, null-safety, maintainability)?
+
+Kita butuh model Dart supaya data JSON punya struktur dan tipe yang jelas, sehingga kesalahan seperti salah tipe atau key typo bisa terdeteksi lebih cepat. Kalau hanya pakai `Map<String, dynamic>`, semua jadi serba-dynamic: rawan error runtime, tidak ada jaminan null-safety, sulit di-refactor, dan kode cepat berantakan. Dengan model, data lebih aman, autocomplete bekerja, dan aplikasi lebih mudah dirawat.
+
+### Apa fungsi package *http* dan *CookieRequest* dalam tugas ini? Jelaskan perbedaan peran *http* vs *CookieRequest*.
+
+Package http dipakai untuk melakukan request HTTP “biasa” (GET/POST, dll.) ke server tanpa mengurus sesi login atau cookie, saya sendiri yang pegang URL, header, dan body-nya. Sementara itu, CookieRequest dari pbp_django_auth adalah wrapper yang sudah otomatis mengelola cookie, session, dan CSRF ke Django yang dipakai untuk login/logout, lalu setiap request berikutnya (GET/POST JSON) akan otomatis membawa cookie user yang sudah login, sehingga view di Django bisa tahu siapa penggunanya.
+
+### Jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+
+Instance CookieRequest perlu dibagikan ke semua komponen (misalnya lewat Provider) supaya satu sesi login yang sama dipakai di seluruh aplikasi. Dengan begitu, ketika user login di satu halaman, halaman lain bisa langsung memakai request yang sama (cookie-nya masih tersimpan), bisa akses endpoint yang butuh autentikasi, dan status loggedIn konsisten di mana-mana. Kalau tiap widget bikin instance CookieRequest sendiri, cookie dan status login tidak terbagi, user seolah-olah “belum login” di halaman lain dan autentikasi jadi berantakan.
+
+### Jelaskan konfigurasi konektivitas yang diperlukan agar Flutter dapat berkomunikasi dengan Django. Mengapa kita perlu menambahkan 10.0.2.2 pada ALLOWED_HOSTS, mengaktifkan CORS dan pengaturan SameSite/cookie, dan menambahkan izin akses internet di Android? Apa yang akan terjadi jika konfigurasi tersebut tidak dilakukan dengan benar?
+
+Agar Flutter bisa berkomunikasi dengan Django, kita harus mengizinkan koneksi dari emulator melalui 10.0.2.2 di ALLOWED_HOSTS, mengaktifkan CORS serta mengatur cookie/SameSite supaya session login bisa tersimpan dan dikirim, dan menambahkan permission internet di Android agar aplikasi boleh melakukan request HTTP. Kalau salah satu konfigurasi ini tidak dilakukan, Flutter bisa gagal terhubung karena Django menolak host, browser memblokir request lewat CORS, cookie login tidak pernah terkirim sehingga selalu dianggap belum login, atau aplikasi Android sama sekali tidak bisa mengakses internet.
+
+### Jelaskan mekanisme pengiriman data mulai dari input hingga dapat ditampilkan pada Flutter.
+
+Data dikirim dari Flutter dengan mengambil nilai input form, mengemasnya sebagai JSON, lalu mengirimkannya ke Django melalui POST. Django menyimpan data ke database, lalu ketika Flutter melakukan GET, Django mengirimkan JSON berisi data terbaru. Flutter mem-parsing JSON itu ke model Dart dan menampilkannya di UI.
+
+### Jelaskan mekanisme autentikasi dari login, register, hingga logout. Mulai dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+
+Proses autentikasi berjalan berurutan. Saat login atau register, Flutter mengirim username dan password ke endpoint Django melalui CookieRequest, Django memvalidasi data (register membuat akun baru, login mencocokkan password), lalu Django mengembalikan respons sekaligus memberikan cookie session yang otomatis disimpan oleh CookieRequest. Cookie ini dipakai untuk semua request berikutnya sehingga Django tahu siapa user yang sedang aktif. Setelah login berhasil, Flutter menampilkan menu utama berdasarkan status loggedIn. Untuk logout, Flutter memanggil endpoint logout Django, Django menghapus session, dan CookieRequest ikut menghapus cookie lokal sehingga user dianggap keluar dan kembali ke halaman login.
+
+### Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+
+#### Membuat halaman login pada proyek tugas Flutter.
+
+1. Buat views login di `authentication/views.py` dan atur URL rootingnya.
+2. Buat `login.dart` di folder `screens`.
+3. Pada file `main.dart`, pada Widget MaterialApp(...), ubah home: MyHomePage() menjadi home: const LoginPage()
+
+#### Mengimplementasikan fitur registrasi akun pada proyek tugas Flutter.
+
+1. Sebelumnya, saya membuat app `authentication` di proyek Django saya dan membuat beberapa perubahan di `settings.py`.
+2. Buat views register di `authentication/views.py` dan atur URL rootingnya.
+3. Buat `register.dart` di folder `screens`.
+4. Pada file `screens/login.dart`, import file `register.dart` dan update fungsi onTap.
+
+#### Mengintegrasikan sistem autentikasi Django dengan proyek tugas Flutter.
+
+1. Atur YOUR_APP_URL sesuai dengan URL PWS.
+2. Instal package yang telah disediakan oleh tim asisten dosen
+    ```
+    flutter pub add provider
+    flutter pub add pbp_django_auth
+    ```
+3. Modifikasi root widget untuk menyediakan CookieRequest library ke semua child widgets dengan menggunakan Provider.
+
+#### Membuat model kustom sesuai dengan proyek aplikasi Django.
+
+1. Buka endpoint JSON dan salin datanya.
+2. Pada situs web Quicktype, ubah name menjadi ProductsEntry, source type menjadi JSON, dan language menjadi Dart.
+3. Tempel data JSON yang telah disalin sebelumnya ke dalam textbox yang tersedia pada Quicktype.
+4. Copy Code dan tempel di `models/products_entry.dart`.
+
+#### Membuat halaman yang berisi daftar semua item yang terdapat pada endpoint JSON di Django yang telah kamu deploy.
+
+Buat `screens/products_entry_list_all.dart` yang gunanya untuk menampilkan semua item.
+
+#### Membuat halaman detail untuk setiap item yang terdapat pada halaman daftar Item.
+
+1. Buat `screens/products_detail.dart` yang gunanya untuk menampikan detail produk.
+2. Update file `screens/products_entry_list_all.dart` untuk menambahkan navigasi ke halaman detail.
+
+#### Melakukan filter pada halaman daftar item dengan hanya menampilkan item yang terasosiasi dengan pengguna yang login.
+
+Karena dari awal aplikasi terdapat menu All Products dan My Products, maka saya membuat `screens/products_entry_list.dart` yang terdapat modifikasi berikut:
+```dart
+final dynamic rawUserId = request.jsonData['user_id'];
+
+final int currentUserId = rawUserId is int
+    ? rawUserId
+    : int.tryParse(rawUserId.toString()) ?? -1;
+
+final userProducts =
+    allProducts.where((p) => p.userId == currentUserId).toList();
+```

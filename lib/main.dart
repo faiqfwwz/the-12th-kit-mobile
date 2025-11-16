@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:the_12th_kit/screens/menu.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:the_12th_kit/screens/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,19 +27,25 @@ class MyApp extends StatelessWidget {
       surface: brandSurface,
     );
 
-    return MaterialApp(
-      title: 'The 12th Kit',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: scheme,
-        scaffoldBackgroundColor: brandMuted,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: navbar,
-          foregroundColor: Colors.white,
-          elevation: 0,
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+      child : MaterialApp(
+        title: 'The 12th Kit',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: scheme,
+          scaffoldBackgroundColor: brandMuted,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: navbar,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
         ),
-      ),
-      home: MyHomePage(),
+        home: const LoginPage(),
+      )
     );
   }
 }
