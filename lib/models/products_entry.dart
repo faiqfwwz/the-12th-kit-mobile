@@ -44,7 +44,7 @@ class ProductsEntry {
         name: json["name"],
         price: json["price"],
         description: json["description"],
-        thumbnail: json["thumbnail"],
+        thumbnail: json["thumbnail"] ?? "",
         category: json["category"],
         isFeatured: json["is_featured"],
         stock: json["stock"],
